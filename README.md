@@ -7,7 +7,6 @@ according to weighted proportions, and is biased towards values
 that haven't been picked as much.
 It's a fair RNG, but it's not blind.
 
-![](https://media.giphy.com/media/SxthdSyeTcbRK/giphy.gif)
 #### Origins (warning, Settlers of Catan knowledge assumed)
 In 2012, I played Settlers of Catan often. I would pick the perfect starting positions
 that had the perfect numbers: 5s, 6s, 9s. Opponents would pick positions with 11s and 10s.
