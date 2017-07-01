@@ -1,0 +1,43 @@
+{
+  "name": "brng",
+  "version": "1.0.0",
+  "description": "Biased random number generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run build && mocha src/index.test.js",
+    "build": "babel -o ./index.js src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elfreyshira/brng.git"
+  },
+  "keywords": [
+    "rng",
+    "random",
+    "number",
+    "generator",
+    "bias",
+    "biased",
+    "dice",
+    "brng"
+  ],
+  "author": "Elfrey",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/elfreyshira/brng/issues"
+  },
+  "homepage": "https://github.com/elfreyshira/brng#readme",
+  "dependencies": {
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-cli": "^6.24.1",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "chai": "^4.0.2",
+    "mocha": "^3.4.2",
+    "seed-random": "^2.2.0"
+  }
+}

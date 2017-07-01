@@ -1,5 +1,5 @@
-# index.js is only for the npm package
-index.js
+# src holds the original code. the npm package has index.js
+src/
 
 # Logs
 logs
