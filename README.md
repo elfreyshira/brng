@@ -27,6 +27,8 @@ Constructor parameters:
     for example {mickeyd: 3, jackinthebox: 3, burgerking: 2, whataburger: 10}
   config.random {Function} -- function that returns random number 0 - 1. Defaults to Math.random
   config.keepHistory {Boolean} -- if true, keep the roll history
+  config.bias {Number} -- between 0.5 and 2. The higher the bias, the more it
+    favors values less chosen. Defaults to 1.
   config.repeatTolerance {Number} -- between 0 and 1. The lower the tolerance, the more
     likely Brng will re-roll if it's a repeat. Defaults to 1.
 
