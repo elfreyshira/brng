@@ -7,18 +7,21 @@ import keys from 'lodash/keys'
 import reduce from 'lodash/reduce'
 import forEach from 'lodash/forEach'
 import isNumber from 'lodash/isNumber'
+import clamp from 'lodash/clamp'
 
-const _ = {mapValues, forEach, constant, cloneDeep, sum, values, keys, reduce, isNumber}
+const _ = {mapValues, forEach, constant, cloneDeep, sum, values, keys, reduce, isNumber, clamp}
 
 /**
  * const roller = new Brng(config)
  *
  * Constructor parameters:
  *  config {Object}
- *  config.originalProportions {Object} -- key-value mapping of weighted proportions.
+ *  config.originalProportions [REQUIRED] {Object} -- key-value mapping of weighted proportions.
  *    for example {mickeyd: 3, jackinthebox: 3, burgerking: 2, whataburger: 10}
  *  config.random {Function} -- function that returns random number 0 - 1. Defaults to Math.random
  *  config.keepHistory {Boolean} -- if true, keep the roll history
+ *  config.bias {Number} -- between 0.5 and 2. The higher the bias, the more it
+ *    favors values less chosen. Defaults to 1.
  *  config.repeatTolerance {Number} -- between 0 and 1. The lower the tolerance, the more
  *    likely Brng will re-roll if it's a repeat. Defaults to 1.
  *
@@ -61,9 +64,10 @@ class Brng {
     this.originalProbabilities = _.mapValues(config.originalProportions, (number) => number / sumTotal)
     this.possibleKeys = _.keys(config.originalProportions)
 
-    this.valueToRedistribute = _.reduce(config.originalProportions, (sum, proportionValue, keyId) => {
+    const baseValueToRedistribute = _.reduce(config.originalProportions, (sum, proportionValue, keyId) => {
       return sum + (proportionValue * this.originalProbabilities[keyId])
     }, 0)
+    this.valueToRedistribute = baseValueToRedistribute * _.clamp(config.bias || 1, 0.5, 2)
   }
 
   // The first step of the algorithm: given a weighted proportion map, randomly select a value
