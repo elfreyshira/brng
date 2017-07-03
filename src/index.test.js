@@ -91,4 +91,49 @@ describe('Brng', function() {
     expect(roller.historyArray.length).to.equal(6)
   })
 
+  describe('repeatTolerance', function () {
+
+    function testNumberOfRepeats(repeatTolerance, sampleSize) {
+      var professionChooser = new Brng({
+        originalProportions: {tank: 3, support: 3, assassin: 3, special: 1},
+        repeatTolerance: repeatTolerance, // defaults to 1
+        random: seed('repeat')
+      })
+
+      const professionHistoryArray = _.times(sampleSize, () => professionChooser.choose())
+
+      let numberOfRepeats = 0
+      let previousProfession = null
+      _.forEach(professionHistoryArray, (profession) => {
+        if (previousProfession === profession) {
+          numberOfRepeats++
+        }
+        previousProfession = profession
+      })
+      return numberOfRepeats
+    }
+
+    it('should not repeat if repeatTolerance === 0 (sample size 30)', function () {
+      const numberOfRepeats = testNumberOfRepeats(0, 30)
+      expect(numberOfRepeats).to.equal(0)
+    })
+
+    it('should most likely repeat if repeatTolerance === 1 (sample size 30)', function () {
+      const numberOfRepeats = testNumberOfRepeats(1, 30)
+      expect(numberOfRepeats).to.be.greaterThan(0)
+    })
+
+    it('repeats should be lower with lower repeat tolerance (sample size 200)', function () {
+      const numberOfRepeats100 = testNumberOfRepeats(1, 200)
+      const numberOfRepeats067 = testNumberOfRepeats(0.67, 200)
+      const numberOfRepeats033 = testNumberOfRepeats(0.33, 200)
+      const numberOfRepeats000 = testNumberOfRepeats(0, 200)
+
+      expect(numberOfRepeats100).to.be.at.least(numberOfRepeats067)
+      expect(numberOfRepeats067).to.be.at.least(numberOfRepeats033)
+      expect(numberOfRepeats033).to.be.at.least(numberOfRepeats000)
+    })
+
+  })
+
 })

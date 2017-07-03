@@ -23,9 +23,12 @@ const roller = new Brng(config)
 
 Constructor parameters:
   config {Object}
-  config.originalProportions {Object} -- {a: 1, b: 1, c: 2}
+  config.originalProportions {Object} -- key-value mapping of weighted proportions.
+    for example {mickeyd: 3, jackinthebox: 3, burgerking: 2, whataburger: 10}
   config.random {Function} -- function that returns random number 0 - 1. Defaults to Math.random
   config.keepHistory {Boolean} -- if true, keep the roll history
+  config.repeatTolerance {Number} -- between 0 and 1. The lower the tolerance, the more
+    likely Brng will re-roll if it's a repeat. Defaults to 1.
 
 Public methods:
   roll() -- selects a random value; remembers previous rolls.

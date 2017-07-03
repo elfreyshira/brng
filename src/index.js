@@ -6,17 +6,21 @@ import values from 'lodash/values'
 import keys from 'lodash/keys'
 import reduce from 'lodash/reduce'
 import forEach from 'lodash/forEach'
+import isNumber from 'lodash/isNumber'
 
-const _ = {mapValues, forEach, constant, cloneDeep, sum, values, keys, reduce, forEach}
+const _ = {mapValues, forEach, constant, cloneDeep, sum, values, keys, reduce, isNumber}
 
 /**
  * const roller = new Brng(config)
  *
  * Constructor parameters:
  *  config {Object}
- *  config.originalProportions {Object} -- {a: 1, b: 1, c: 2}
+ *  config.originalProportions {Object} -- key-value mapping of weighted proportions.
+ *    for example {mickeyd: 3, jackinthebox: 3, burgerking: 2, whataburger: 10}
  *  config.random {Function} -- function that returns random number 0 - 1. Defaults to Math.random
  *  config.keepHistory {Boolean} -- if true, keep the roll history
+ *  config.repeatTolerance {Number} -- between 0 and 1. The lower the tolerance, the more
+ *    likely Brng will re-roll if it's a repeat. Defaults to 1.
  *
  * Public methods:
  *  roll() -- selects a random value; remembers previous rolls.
@@ -47,6 +51,8 @@ class Brng {
       this.historyArray = []
     }
 
+    this.previousRoll = null
+    this.repeatTolerance = _.isNumber(config.repeatTolerance) ? config.repeatTolerance : 1
     this.random = config.random || Math.random
     this.originalProportions = _.cloneDeep(config.originalProportions)
     this.proportions = _.cloneDeep(config.originalProportions)
@@ -89,7 +95,17 @@ class Brng {
     })
   }
 
+  passCriteria (keyChosen) {
+    if (this.previousRoll === keyChosen && this.repeatTolerance < 1) {
+      return this.random() < this.repeatTolerance
+    }
+    else {
+      return true
+    }
+  }
+
   rollSideEffects (keyChosen) {
+    this.previousRoll = keyChosen
     if (this.shouldKeepHistory) {
       this.historyMapping[keyChosen] = this.historyMapping[keyChosen] + 1
       this.historyArray.push(keyChosen)
@@ -98,6 +114,9 @@ class Brng {
 
   roll () {
     const keyChosen = this.chooseKeyFromProportions()
+    if (!this.passCriteria(keyChosen)) {
+      return this.roll()
+    }
     this.shiftProportions(keyChosen)
     this.rollSideEffects(keyChosen)
     return keyChosen
