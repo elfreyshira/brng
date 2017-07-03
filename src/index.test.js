@@ -6,10 +6,7 @@ var Brng = require('../')
 
 describe('Brng', function() {
   it('should flip a coin pretty well', function () {
-    var roller = new Brng({
-      originalProportions: Brng.defaultProportions.coin,
-      random: seed('coin')
-    })
+    var roller = new Brng(Brng.defaultProportions.coin, {random: seed('coin')})
 
     var actualFlipResults = _.times(10, () => roller.roll())
 
@@ -20,10 +17,7 @@ describe('Brng', function() {
   })
 
   it('should roll two 6-sided dice pretty well', function () {
-    var roller = new Brng({
-      originalProportions: Brng.defaultProportions.two6SidedDice,
-      random: seed('two6SidedDice')
-    })
+    var roller = new Brng(Brng.defaultProportions.two6SidedDice, {random: seed('two6SidedDice')})
 
     var actualRollResults = _.times(36, () => roller.roll())
 
@@ -35,8 +29,7 @@ describe('Brng', function() {
   })
 
   it('should keep roll history', function () {
-    var roller = new Brng({
-      originalProportions: {tank: 3, assassin: 3, support: 3, special: 1},
+    var roller = new Brng({tank: 3, assassin: 3, support: 3, special: 1}, {
       random: seed('hit'),
       keepHistory: true
     })
@@ -59,9 +52,7 @@ describe('Brng', function() {
   })
 
   it('should be 99% accurate over large sample sizes', function () {
-    var roller = new Brng({
-      originalProportions: {a: 1, b: 2, c: 3, d: 4}
-    })
+    var roller = new Brng({a: 1, b: 2, c: 3, d: 4})
     var historyMapping = {a: 0, b: 0, c: 0, d: 0}
     var sampleSize = 300
     for (var i = 0; i < sampleSize; i++) {
@@ -76,10 +67,7 @@ describe('Brng', function() {
   })
 
   it('should have working aliases for roll()', function () {
-    var roller = new Brng({
-      originalProportions: {goat: 2, sheep: 5, dragon: 10},
-      keepHistory: true
-    })
+    var roller = new Brng({goat: 2, sheep: 5, dragon: 10}, {keepHistory: true})
 
     roller.roll()
     roller.flip()
@@ -94,8 +82,7 @@ describe('Brng', function() {
   describe('repeatTolerance', function () {
 
     function testNumberOfRepeats(repeatTolerance, sampleSize) {
-      var professionChooser = new Brng({
-        originalProportions: {tank: 3, support: 3, assassin: 3, special: 1},
+      var professionChooser = new Brng({tank: 3, support: 3, assassin: 3, special: 1}, {
         repeatTolerance: repeatTolerance, // defaults to 1
         random: seed('repeat')
       })

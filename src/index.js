@@ -15,9 +15,9 @@ const _ = {mapValues, forEach, constant, cloneDeep, sum, values, keys, reduce, i
  * const roller = new Brng(config)
  *
  * Constructor parameters:
+ *  originalProportions [REQUIRED] {Object[String/Number:Number]} -- key-value mapping of
+ *    weighted proportions. For example {mickeyd: 3, jackinthebox: 3, burgerking: 2, whataburger: 10}
  *  config {Object}
- *  config.originalProportions [REQUIRED] {Object} -- key-value mapping of weighted proportions.
- *    for example {mickeyd: 3, jackinthebox: 3, burgerking: 2, whataburger: 10}
  *  config.random {Function} -- function that returns random number 0 - 1. Defaults to Math.random
  *  config.keepHistory {Boolean} -- if true, keep the roll history
  *  config.bias {Number} -- between 0.5 and 2. The higher the bias, the more it
@@ -47,24 +47,24 @@ class Brng {
     coin: {heads: 1, tails: 1}
   }
 
-  constructor (config) {
+  constructor (originalProportions, config = {}) {
     this.shouldKeepHistory = !!config.keepHistory
     if (this.shouldKeepHistory) {
-      this.historyMapping = _.mapValues(config.originalProportions, _.constant(0))
+      this.historyMapping = _.mapValues(originalProportions, _.constant(0))
       this.historyArray = []
     }
 
     this.previousRoll = null
     this.repeatTolerance = _.isNumber(config.repeatTolerance) ? config.repeatTolerance : 1
     this.random = config.random || Math.random
-    this.originalProportions = _.cloneDeep(config.originalProportions)
-    this.proportions = _.cloneDeep(config.originalProportions)
+    this.originalProportions = _.cloneDeep(originalProportions)
+    this.proportions = _.cloneDeep(originalProportions)
 
-    const sumTotal = _.sum(_.values(config.originalProportions))
-    this.originalProbabilities = _.mapValues(config.originalProportions, (number) => number / sumTotal)
-    this.possibleKeys = _.keys(config.originalProportions)
+    const sumTotal = _.sum(_.values(originalProportions))
+    this.originalProbabilities = _.mapValues(originalProportions, (number) => number / sumTotal)
+    this.possibleKeys = _.keys(originalProportions)
 
-    const baseValueToRedistribute = _.reduce(config.originalProportions, (sum, proportionValue, keyId) => {
+    const baseValueToRedistribute = _.reduce(originalProportions, (sum, proportionValue, keyId) => {
       return sum + (proportionValue * this.originalProbabilities[keyId])
     }, 0)
     this.valueToRedistribute = baseValueToRedistribute * _.clamp(config.bias || 1, 0.5, 2)

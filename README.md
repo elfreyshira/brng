@@ -22,9 +22,9 @@ thoughts and mucking around, the algorithm was born.
 const roller = new Brng(config)
 
 Constructor parameters:
+  originalProportions [REQUIRED] {Object[String/Number:Number]} -- key-value mapping of
+    weighted proportions. For example {mickeyd: 3, jackinthebox: 3, burgerking: 2, whataburger: 10}
   config {Object}
-  config.originalProportions {Object} -- key-value mapping of weighted proportions.
-    for example {mickeyd: 3, jackinthebox: 3, burgerking: 2, whataburger: 10}
   config.random {Function} -- function that returns random number 0 - 1. Defaults to Math.random
   config.keepHistory {Boolean} -- if true, keep the roll history
   config.bias {Number} -- between 0.5 and 2. The higher the bias, the more it
