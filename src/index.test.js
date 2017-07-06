@@ -55,15 +55,34 @@ describe('Brng', function() {
     var roller = new Brng({a: 1, b: 2, c: 3, d: 4})
     var historyMapping = {a: 0, b: 0, c: 0, d: 0}
     var sampleSize = 300
+
     for (var i = 0; i < sampleSize; i++) {
       var chosenLetter = roller.roll()
       historyMapping[chosenLetter] = historyMapping[chosenLetter] + 1
     }
+
     // console.log(historyMapping)
     expect(historyMapping.a).to.be.closeTo(sampleSize*.1, sampleSize*0.01)
     expect(historyMapping.b).to.be.closeTo(sampleSize*.2, sampleSize*0.01)
     expect(historyMapping.c).to.be.closeTo(sampleSize*.3, sampleSize*0.01)
     expect(historyMapping.d).to.be.closeTo(sampleSize*.4, sampleSize*0.01)
+  })
+
+  it('should be 100% accurate with bias=4 even with small sample sizes', function () {
+    var roller = new Brng({a: 1, b: 2, c: 3, d: 4}, {bias: 4})
+    var historyMapping = {a: 0, b: 0, c: 0, d: 0}
+    var sampleSize = 10
+
+    for (var i = 0; i < sampleSize; i++) {
+      var chosenLetter = roller.roll()
+      historyMapping[chosenLetter] = historyMapping[chosenLetter] + 1
+    }
+
+    // console.log(historyMapping)
+    expect(historyMapping.a).to.equal(sampleSize*.1)
+    expect(historyMapping.b).to.equal(sampleSize*.2)
+    expect(historyMapping.c).to.equal(sampleSize*.3)
+    expect(historyMapping.d).to.equal(sampleSize*.4)
   })
 
   it('should have working aliases for roll()', function () {

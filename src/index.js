@@ -20,10 +20,10 @@ const _ = {mapValues, forEach, constant, cloneDeep, sum, values, keys, reduce, i
  *  config {Object}
  *  config.random {Function} -- function that returns random number 0 - 1. Defaults to Math.random
  *  config.keepHistory {Boolean} -- if true, keep the roll history
- *  config.bias {Number} -- between 0.5 and 2. The higher the bias, the more it
- *    favors values less chosen. Defaults to 1.
+ *  config.bias {Number} -- between 0 and 4. The higher the bias, the more it
+ *    favors values less chosen. If 0, it's basically a normal RNG. Defaults to 1.
  *  config.repeatTolerance {Number} -- between 0 and 1. The lower the tolerance, the more
- *    likely Brng will re-roll if it's a repeat. Defaults to 1.
+ *    likely Brng will re-roll if it's a repeat. If 0, it'll never repeat. Defaults to 1.
  *
  * Public methods:
  *  roll() -- selects a random value; remembers previous rolls.
@@ -55,7 +55,7 @@ class Brng {
     }
 
     this.previousRoll = null
-    this.repeatTolerance = _.isNumber(config.repeatTolerance) ? config.repeatTolerance : 1
+    this.repeatTolerance = _.isNumber(config.repeatTolerance) ? _.clamp(config.repeatTolerance, 0, 1) : 1
     this.random = config.random || Math.random
     this.originalProportions = _.cloneDeep(originalProportions)
     this.proportions = _.cloneDeep(originalProportions)
@@ -67,7 +67,8 @@ class Brng {
     const baseValueToRedistribute = _.reduce(originalProportions, (sum, proportionValue, keyId) => {
       return sum + (proportionValue * this.originalProbabilities[keyId])
     }, 0)
-    this.valueToRedistribute = baseValueToRedistribute * _.clamp(config.bias || 1, 0.5, 2)
+    const biasMultiplier = _.isNumber(config.bias) ? _.clamp(config.bias, 0, 4) : 1
+    this.valueToRedistribute = baseValueToRedistribute * biasMultiplier
   }
 
   // The first step of the algorithm: given a weighted proportion map, randomly select a value

@@ -19,7 +19,7 @@ thoughts and mucking around, the algorithm was born.
 
 # API
 ```
-const roller = new Brng(config)
+const roller = new Brng(originalProportions, config) // config is optional
 
 Constructor parameters:
   originalProportions [REQUIRED] {Object[String/Number:Number]} -- key-value mapping of
@@ -27,10 +27,10 @@ Constructor parameters:
   config {Object}
   config.random {Function} -- function that returns random number 0 - 1. Defaults to Math.random
   config.keepHistory {Boolean} -- if true, keep the roll history
-  config.bias {Number} -- between 0.5 and 2. The higher the bias, the more it
-    favors values less chosen. Defaults to 1.
+  config.bias {Number} -- between 0 and 4. The higher the bias, the more it
+    favors values less chosen. If 0, it's basically a normal RNG. Defaults to 1.
   config.repeatTolerance {Number} -- between 0 and 1. The lower the tolerance, the more
-    likely Brng will re-roll if it's a repeat. Defaults to 1.
+    likely Brng will re-roll if it's a repeat. If 0, it'll never repeat. Defaults to 1.
 
 Public methods:
   roll() -- selects a random value; remembers previous rolls.
@@ -62,7 +62,7 @@ var Brng = require('brng')
 ```
 
 ```
-const twoCoinFlipper = new Brng({originalProportions: {headsHeads: 1, headsTails: 2, tailsTails: 1}})
+const twoCoinFlipper = new Brng({headsHeads: 1, headsTails: 2, tailsTails: 1})
 
 const result = twoCoinFlipper.flip()
 console.log(result) // 'tailsTails'
@@ -73,8 +73,7 @@ console.log(result)
 ```
 
 ```
-const catanDiceRoller = new Brng({
-  originalProportions: Brng.defaultProportions.two6SidedDice,
+const catanDiceRoller = new Brng(Brng.defaultProportions.two6SidedDice, {
   random: FancyRandomLibrary.doRandom,
   keepHistory: true
 })
