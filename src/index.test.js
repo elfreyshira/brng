@@ -98,6 +98,76 @@ describe('Brng', function() {
     expect(roller.historyArray.length).to.equal(6)
   })
 
+  describe('undo', function() {
+    it('should throw error WITHOUT {keepHistory: true}', function () {
+      var roller = new Brng({a: 1, b: 2, c: 3, d: 4}, {keepHistory: null})
+
+      roller.roll();
+      roller.roll();
+      roller.roll();
+
+      var badFn = function () { roller.undo() }
+
+      expect(badFn).to.throw()
+    })
+
+    it('should not throw error WITH {keepHistory: true}', function () {
+      var roller = new Brng({a: 1, b: 2, c: 3, d: 4}, {keepHistory: true})
+
+      roller.roll();
+      roller.roll();
+      roller.roll();
+
+      var badFn = function () { roller.undo() }
+
+      expect(badFn).to.not.throw()
+    })
+
+    it('should update the historyArray correctly', function () {
+      var roller = new Brng({a: 1, b: 2, c: 3, d: 4}, {keepHistory: true})
+
+      // roll 20 times
+      _.times(10, function () {roller.roll()})
+
+      var previousHistoryArray = _.cloneDeep(roller.historyArray)
+      roller.roll()
+      expect(previousHistoryArray).to.not.deep.equal(roller.historyArray)
+
+      roller.undo()
+      expect(previousHistoryArray).to.deep.equal(roller.historyArray)
+      
+    })
+
+    it('should update the historyMapping correctly', function () {
+      var roller = new Brng({a: 1, b: 2, c: 3, d: 4}, {keepHistory: true})
+
+      // roll 20 times
+      _.times(10, function () {roller.roll()})
+
+      var previousHistoryMapping = _.cloneDeep(roller.historyMapping)
+      roller.roll()
+      expect(previousHistoryMapping).to.not.deep.equal(roller.historyMapping)
+      roller.undo()
+      expect(previousHistoryMapping).to.deep.equal(roller.historyMapping)
+      
+    })
+
+    it('should update the proportions correctly', function () {
+      var roller = new Brng({a: 1, b: 2, c: 3, d: 4}, {keepHistory: true})
+
+      // roll 20 times
+      _.times(10, function () {roller.roll()})
+
+      var previousProportions = _.cloneDeep(roller.proportions)
+      roller.roll()
+      expect(previousProportions).to.not.deep.equal(roller.proportions)
+      roller.undo()
+      expect(previousProportions).to.deep.equal(roller.proportions)
+      
+    })
+
+  })
+  
   describe('repeatTolerance', function () {
 
     function testNumberOfRepeats(repeatTolerance, sampleSize) {

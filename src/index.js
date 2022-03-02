@@ -48,8 +48,8 @@ class Brng {
   }
 
   constructor (originalProportions, config = {}) {
-    this.shouldKeepHistory = !!config.keepHistory
-    if (this.shouldKeepHistory) {
+    this.keepHistory = !!config.keepHistory
+    if (this.keepHistory) {
       this.historyMapping = _.mapValues(originalProportions, _.constant(0))
       this.historyArray = []
     }
@@ -111,7 +111,7 @@ class Brng {
 
   rollSideEffects (keyChosen) {
     this.previousRoll = keyChosen
-    if (this.shouldKeepHistory) {
+    if (this.keepHistory) {
       this.historyMapping[keyChosen] = this.historyMapping[keyChosen] + 1
       this.historyArray.push(keyChosen)
     }
@@ -132,9 +132,17 @@ class Brng {
   choose = this.roll
   randomize = this.roll
 
+  undo () {
+    if (!this.keepHistory) { // throw if there's no keepHistory
+      throw new Error('To undo, set `{keepHistory: true}`.')
+    }
+    const previousChoice = this.historyArray.pop() // ! writes to historyArray
+    this.historyMapping[previousChoice] = this.historyMapping[previousChoice] - 1
+  }
+
   reset () {
     this.proportions = _.cloneDeep(this.originalProportions)
-    if (this.shouldKeepHistory) {
+    if (this.keepHistory) {
       this.historyMapping = _.mapValues(this.originalProportions, _.constant(0))
       this.historyArray = []
     }
