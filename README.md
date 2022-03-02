@@ -36,6 +36,7 @@ Public methods:
   roll() -- selects a random value; remembers previous rolls.
   flip(), pick(), select(), choose(), randomize() -- aliases of `roll()`
   reset() -- resets all history and resets previous rolls
+  undo () -- undo the previous roll. must have `config.keepHistory === true`
 
 Public readable values (if keepHistory === true):
   historyArray -- array of every single previous roll
