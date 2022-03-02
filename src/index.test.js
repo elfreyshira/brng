@@ -155,15 +155,47 @@ describe('Brng', function() {
     it('should update the proportions correctly', function () {
       var roller = new Brng({a: 1, b: 2, c: 3, d: 4}, {keepHistory: true})
 
+      var roundProportions = function roundProportions (proportions) {
+        return _.map(proportions, function (value) {
+          return _.round(value, 3)
+        })
+      }
+
+      // test it 3 times, just in case
+      _.times(3, function () {
+
+        _.times(6, function () {roller.roll()})
+        var previousProportions = _.cloneDeep(roller.proportions)
+
+        roller.roll()
+        expect(
+          roundProportions(previousProportions)).to.not.deep.equal(
+          roundProportions(roller.proportions)
+        )
+
+        roller.undo()
+        expect(
+          roundProportions(previousProportions)).to.deep.equal(
+          roundProportions(roller.proportions)
+        )
+
+      })
+      
+    })
+
+    it('should return the previous choice correctly', function () {
+      var roller = new Brng({a: 1, b: 2, c: 3, d: 4}, {keepHistory: true})
+
       // roll 20 times
       _.times(10, function () {roller.roll()})
 
-      var previousProportions = _.cloneDeep(roller.proportions)
-      roller.roll()
-      expect(previousProportions).to.not.deep.equal(roller.proportions)
-      roller.undo()
-      expect(previousProportions).to.deep.equal(roller.proportions)
-      
+      // do this multiple times in case it rolls the same thing
+      _.times(6, function () {
+        var previousChoice = roller.roll()
+        var undoReturn = roller.undo()
+        expect(previousChoice).to.deep.equal(undoReturn)
+      })
+
     })
 
   })

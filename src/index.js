@@ -87,15 +87,25 @@ class Brng {
       }
     }
 
-    throw new Error('Should not reach here.')
+    console.warn('Code should not reach here.')
   }
 
-  // The second step of the algorith: given the selected value, shift the proportion map around that value
+  // The second step of the algorithm: given the selected value, shift the proportion map around that value
   // WARNING: method writes to this.proportions
   shiftProportions (keyChosen) {
     this.proportions[keyChosen] = this.proportions[keyChosen] - this.valueToRedistribute
     _.forEach(this.possibleKeys, (otherKey) => {
       this.proportions[otherKey] = this.proportions[otherKey] +
+        (this.valueToRedistribute * this.originalProbabilities[otherKey])
+    })
+  }
+
+  // the reverse of shiftProportions() for undo
+  // WARNING: method writes to this.proportions
+  reverseShiftProportions (keyChosen) {
+    this.proportions[keyChosen] = this.proportions[keyChosen] + this.valueToRedistribute
+    _.forEach(this.possibleKeys, (otherKey) => {
+      this.proportions[otherKey] = this.proportions[otherKey] -
         (this.valueToRedistribute * this.originalProbabilities[otherKey])
     })
   }
@@ -115,6 +125,7 @@ class Brng {
       this.historyMapping[keyChosen] = this.historyMapping[keyChosen] + 1
       this.historyArray.push(keyChosen)
     }
+    return keyChosen
   }
 
   roll () {
@@ -138,6 +149,10 @@ class Brng {
     }
     const previousChoice = this.historyArray.pop() // ! writes to historyArray
     this.historyMapping[previousChoice] = this.historyMapping[previousChoice] - 1
+
+    this.reverseShiftProportions(previousChoice)
+
+    return previousChoice
   }
 
   reset () {
