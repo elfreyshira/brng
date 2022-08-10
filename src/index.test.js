@@ -126,13 +126,13 @@ describe('Brng', function() {
       roller.roll('anemoia')
       roller.roll('anemoia')
       roller.roll('anemoia')
-            
+
       expect(roller.roll()).to.not.equal('anemoia')
       expect(roller.roll()).to.not.equal('anemoia')
     })
 
     it('should update historyArray and historyMapping correctly', function () {
-      var roller = new Brng({anemoia: 10, mechalane: 7, ares: 5}, {bias: 1})
+      var roller = new Brng({anemoia: 10, mechalane: 7, ares: 5}, {keepHistory: true})
       roller.roll('anemoia')
       roller.roll('mechalane')
       roller.roll('ares')
@@ -160,6 +160,13 @@ describe('Brng', function() {
       expect(thirdChosen).to.equal('anemoia')
       expect(fourthChosen).to.equal('anemoia')
       expect(fifthChosen).to.equal('anemoia')
+    })
+
+    it('should throw error when giving a value that is not in originalProportions', function () {
+      var roller = new Brng({anemoia: 10, mechalane: 7, ares: 5}, {repeatTolerance: 0})
+      roller.roll()
+      var badFn = function () { roller.roll('badKey') }
+      expect(badFn).to.throw('badKey')
     })
   })
 

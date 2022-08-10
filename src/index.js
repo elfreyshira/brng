@@ -8,8 +8,11 @@ import reduce from 'lodash/reduce'
 import forEach from 'lodash/forEach'
 import isNumber from 'lodash/isNumber'
 import clamp from 'lodash/clamp'
+import has from 'lodash/has'
+import isUndefined from 'lodash/isUndefined'
 
-const _ = {mapValues, forEach, constant, cloneDeep, sum, values, keys, reduce, isNumber, clamp}
+const _ = {mapValues, forEach, constant, cloneDeep,
+  sum, values, keys, reduce, isNumber, clamp, has, isUndefined}
 
 /**
  * const roller = new Brng(config)
@@ -130,10 +133,22 @@ class Brng {
     return keyChosen
   }
 
-  roll () {
-    const keyChosen = this.chooseKeyFromProportions()
-    if (!this.passCriteria(keyChosen)) {
-      return this.roll()
+  roll (/*value*/) { // value is optional
+    const keyFromArgs = arguments[0]
+    const keyIsAvailable = _.has(this.originalProportions, keyFromArgs)
+    let keyChosen
+    
+    if (!_.isUndefined(keyFromArgs) && keyIsAvailable) { // this.roll(value) is called
+      keyChosen = keyFromArgs
+    }
+    else if (!_.isUndefined(keyFromArgs) && !keyIsAvailable) { // this.roll(value) is called incorectly
+      throw new Error('The value ' + keyFromArgs + ' is not in your originalProportions.')
+    }
+    else { // the normal this.roll()
+      keyChosen = this.chooseKeyFromProportions()
+      if (!this.passCriteria(keyChosen)) {
+        return this.roll()
+      }
     }
     this.shiftProportions(keyChosen)
     this.rollSideEffects(keyChosen)
