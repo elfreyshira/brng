@@ -98,6 +98,71 @@ describe('Brng', function() {
     expect(roller.historyArray.length).to.equal(6)
   })
 
+  describe('roll(value)', function() {
+    it('should roll the given value, ignoring previous rolls', function () {
+      var roller = new Brng({anemoia: 10, mechalane: 7, ares: 5}, {keepHistory: true})
+
+      roller.roll()
+      roller.roll()
+      var thirdChosen = roller.roll('anemoia')
+      var fourthChosen = roller.roll('mechalane')
+      var fifthChosen = roller.roll('ares')
+      var sixthChosen = roller.roll('ares')
+
+      expect(thirdChosen).to.equal('anemoia')
+      expect(fourthChosen).to.equal('mechalane')
+      expect(fifthChosen).to.equal('ares')
+      expect(sixthChosen).to.equal('ares')
+    })
+
+    it('should shiftProportions correctly', function () {
+      var roller = new Brng({anemoia: 10, mechalane: 7, ares: 5}, {bias: 4})
+
+      roller.roll('anemoia')
+      expect(roller.proportions).to.not.deep.equal(roller.originalProportions)
+
+      roller.roll('anemoia')
+      roller.roll('anemoia')
+      roller.roll('anemoia')
+      roller.roll('anemoia')
+      roller.roll('anemoia')
+            
+      expect(roller.roll()).to.not.equal('anemoia')
+      expect(roller.roll()).to.not.equal('anemoia')
+    })
+
+    it('should update historyArray and historyMapping correctly', function () {
+      var roller = new Brng({anemoia: 10, mechalane: 7, ares: 5}, {bias: 1})
+      roller.roll('anemoia')
+      roller.roll('mechalane')
+      roller.roll('ares')
+      roller.roll('anemoia')
+      roller.roll('anemoia')
+
+      expect(roller.historyArray).to.deep.equal(
+        ['anemoia', 'mechalane', 'ares', 'anemoia', 'anemoia']
+      )
+      expect(roller.historyMapping).to.deep.equal({
+        anemoia: 3,
+        mechalane: 1,
+        ares: 1
+      })
+    })
+
+    it('should ignore repeatTolerance', function() {
+      var roller = new Brng({anemoia: 10, mechalane: 7, ares: 5}, {repeatTolerance: 0})
+      roller.roll()
+      roller.roll()
+      var thirdChosen = roller.roll('anemoia')
+      var fourthChosen = roller.roll('anemoia')
+      var fifthChosen = roller.roll('anemoia')
+      
+      expect(thirdChosen).to.equal('anemoia')
+      expect(fourthChosen).to.equal('anemoia')
+      expect(fifthChosen).to.equal('anemoia')
+    })
+  })
+
   describe('undo', function() {
     it('should throw error WITHOUT {keepHistory: true}', function () {
       var roller = new Brng({a: 1, b: 2, c: 3, d: 4}, {keepHistory: null})

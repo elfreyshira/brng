@@ -27,6 +27,7 @@ const _ = {mapValues, forEach, constant, cloneDeep, sum, values, keys, reduce, i
  *
  * Public methods:
  *  roll() -- selects a random value; remembers previous rolls.
+ *  roll(value) -- force select the value from your original proportions. Ignores all criteria.
  *  flip(), pick(), select(), choose(), randomize() -- aliases of `roll()`
  *  reset() -- resets all history and resets previous rolls
  *  undo () -- undo the previous roll. must have `config.keepHistory === true`
