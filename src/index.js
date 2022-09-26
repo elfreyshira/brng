@@ -10,9 +10,13 @@ import isNumber from 'lodash/isNumber'
 import clamp from 'lodash/clamp'
 import has from 'lodash/has'
 import isUndefined from 'lodash/isUndefined'
+import isObject from 'lodash/isObject'
+import isArray from 'lodash/isArray'
+import includes from 'lodash/includes'
 
 const _ = {mapValues, forEach, constant, cloneDeep,
-  sum, values, keys, reduce, isNumber, clamp, has, isUndefined}
+  sum, values, keys, reduce, isNumber, clamp, has,
+  isUndefined, isObject, isArray, includes}
 
 /**
  * const roller = new Brng(config)
@@ -32,6 +36,7 @@ const _ = {mapValues, forEach, constant, cloneDeep,
  *  roll() -- selects a random value; remembers previous rolls.
  *  roll(value) -- force select the value from your original proportions. Ignores all criteria.
  *  roll({exclude: [value1, value2]}) -- select a value that excludes any values in the array
+ * 
  *  flip(), pick(), select(), choose(), randomize() -- aliases of `roll()`
  *  reset() -- resets all history and resets previous rolls
  *  undo () -- undo the previous roll. must have `config.keepHistory === true`
@@ -134,6 +139,22 @@ class Brng {
     return keyChosen
   }
 
+  selectKeyAtRandom (config) {
+    let excludeList = []
+    let keyChosen
+
+    if (_.isObject(config) && _.isArray(config.exclude)) {
+      excludeList = config.exclude
+    }
+
+    // !keyChosen -- it's the first iteration
+    // _.includes(excludeList, keyChosen) -- key already chosen, but should be excluded
+    while (!keyChosen || _.includes(excludeList, keyChosen)) {
+      keyChosen = this.chooseKeyFromProportions()
+    }
+    return keyChosen
+
+  }
 
   roll (/* value or config */) { // optional
     const keyFromArgs = arguments[0]
@@ -143,11 +164,14 @@ class Brng {
     if (!_.isUndefined(keyFromArgs) && keyIsAvailable) { // this.roll(value) is called
       keyChosen = keyFromArgs
     }
-    else if (!_.isUndefined(keyFromArgs) && !keyIsAvailable) { // this.roll(value) is called incorectly
+    else if (!_.isUndefined(keyFromArgs) && !keyIsAvailable && !_.isObject(keyFromArgs)) {
+      // this.roll(value) is called incorectly
       throw new Error('The value ' + keyFromArgs + ' is not in your originalProportions.')
     }
     else { // the normal this.roll()
-      keyChosen = this.chooseKeyFromProportions()
+
+      keyChosen = this.selectKeyAtRandom(arguments[0])
+
       if (!this.passCriteria(keyChosen)) {
         return this.roll()
       }
