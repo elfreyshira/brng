@@ -316,4 +316,40 @@ describe('Brng', function() {
 
   })
 
+  describe('exclude', function () {
+    
+    it('should be accepted by the roll function', function () {
+      const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
+      
+      function testFunction () {
+        fruitPicker.roll({exclude:['coconut']})
+      }
+      expect(testFunction).to.not.throw()
+    })
+
+    it('should exclude any values given', function () {
+      const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
+      
+      fruitPicker.roll()
+
+      expect(fruitPicker.roll({exclude:['coconut']})).to.not.equal('coconut')
+      expect(fruitPicker.roll({exclude:['mango']})).to.not.equal('mango')
+      expect(fruitPicker.roll({exclude:['orange']})).to.not.equal('orange')
+      expect(fruitPicker.roll({exclude:['apple']})).to.not.equal('apple')
+
+      // expect(
+      //   fruitPicker.roll({exclude: ['coconut', 'apple']})
+      // ).to.not.be.oneOf(['coconut', 'apple'])
+      // expect(fruitPicker.roll({exclude:['apple', 'orange']}).to.not.be.oneOf(['apple', 'orange'])
+      // expect(fruitPicker.roll({exclude:['orange', 'mango']}).to.not.be.oneOf(['orange', 'mango'])
+      // expect(fruitPicker.roll({exclude:['mango', 'coconut']}).to.not.be.oneOf(['mango', 'coconut'])
+
+      expect(fruitPicker.roll({exclude:['coconut']})).to.not.equal('coconut')
+      expect(fruitPicker.roll({exclude:['mango']})).to.not.equal('mango')
+      expect(fruitPicker.roll({exclude:['orange']})).to.not.equal('orange')
+      expect(fruitPicker.roll({exclude:['apple']})).to.not.equal('apple')
+
+    })
+  })
+
 })

@@ -31,6 +31,7 @@ const _ = {mapValues, forEach, constant, cloneDeep,
  * Public methods:
  *  roll() -- selects a random value; remembers previous rolls.
  *  roll(value) -- force select the value from your original proportions. Ignores all criteria.
+ *  roll({exclude: [value1, value2]}) -- select a value that excludes any values in the array
  *  flip(), pick(), select(), choose(), randomize() -- aliases of `roll()`
  *  reset() -- resets all history and resets previous rolls
  *  undo () -- undo the previous roll. must have `config.keepHistory === true`
@@ -133,7 +134,8 @@ class Brng {
     return keyChosen
   }
 
-  roll (/*value*/) { // value is optional
+
+  roll (/* value or config */) { // optional
     const keyFromArgs = arguments[0]
     const keyIsAvailable = _.has(this.originalProportions, keyFromArgs)
     let keyChosen
