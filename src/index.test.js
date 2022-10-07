@@ -351,10 +351,12 @@ describe('Brng', function() {
 
     it('should throw error when the remaining proportions sum up to a negative value', function () {
       const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3})
+      
       fruitPicker.roll('apple')
       fruitPicker.roll('orange')
       fruitPicker.roll('orange')
-      expect(() => fruitPicker.roll({exclude: ['mango']})).to.throw()
+
+      expect(() => fruitPicker.roll({exclude: ['mango']})).to.throw('negative')
     })
 
   })
@@ -376,24 +378,24 @@ describe('Brng', function() {
       fruitPicker.roll()
 
       expect(fruitPicker.roll({only:['apple', 'orange']})).to.be.oneOf(['apple', 'orange'])
-      expect(fruitPicker.roll({only:['apple', 'orange']})).to.be.oneOf(['apple', 'orange'])
-
       expect(fruitPicker.roll({only:['mango', 'coconut']})).to.be.oneOf(['mango', 'coconut'])
-      expect(fruitPicker.roll({only:['mango', 'coconut']})).to.be.oneOf(['mango', 'coconut'])
-
       expect(fruitPicker.roll({only:['apple', 'mango']})).to.be.oneOf(['apple', 'mango'])
-      expect(fruitPicker.roll({only:['apple', 'mango']})).to.be.oneOf(['apple', 'mango'])
-
       expect(fruitPicker.roll({only:['orange', 'coconut']})).to.be.oneOf(['orange', 'coconut'])
+
+      expect(fruitPicker.roll({only:['apple', 'orange']})).to.be.oneOf(['apple', 'orange'])
+      expect(fruitPicker.roll({only:['mango', 'coconut']})).to.be.oneOf(['mango', 'coconut'])
+      expect(fruitPicker.roll({only:['apple', 'mango']})).to.be.oneOf(['apple', 'mango'])
       expect(fruitPicker.roll({only:['orange', 'coconut']})).to.be.oneOf(['orange', 'coconut'])
     })
 
     it('should throw error when the possible proportions sum up to a negative value', function () {
       const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3})
+
       fruitPicker.roll('apple')
       fruitPicker.roll('orange')
       fruitPicker.roll('orange')
-      expect(() => fruitPicker.roll({only: ['apple', 'orange']})).to.throw()
+
+      expect(() => fruitPicker.roll({only: ['apple', 'orange']})).to.throw('negative')
     })
 
   })

@@ -13,10 +13,13 @@ import isUndefined from 'lodash/isUndefined'
 import isObject from 'lodash/isObject'
 import isArray from 'lodash/isArray'
 import includes from 'lodash/includes'
+import pick from 'lodash/pick'
+import isEmpty from 'lodash/isEmpty'
+import without from 'lodash/without'
 
 const _ = {mapValues, forEach, constant, cloneDeep,
   sum, values, keys, reduce, isNumber, clamp, has,
-  isUndefined, isObject, isArray, includes}
+  isUndefined, isObject, isArray, includes, pick, isEmpty, without}
 
 /**
  * const roller = new Brng(config)
@@ -36,6 +39,7 @@ const _ = {mapValues, forEach, constant, cloneDeep,
  *  roll() -- selects a random value; remembers previous rolls.
  *  roll(value) -- force select the value from your original proportions. Ignores all criteria.
  *  roll({exclude: [value1, value2]}) -- select a value that excludes any values in the array
+ *  roll({only: [value1, value2]}) -- select one of the values only within the given array
  * 
  *  flip(), pick(), select(), choose(), randomize() -- aliases of `roll()`
  *  reset() -- resets all history and resets previous rolls
@@ -83,14 +87,26 @@ class Brng {
   }
 
   // The first step of the algorithm: given a weighted proportion map, randomly select a value
-  chooseKeyFromProportions () {
-    const sumTotal = _.sum(_.values(this.proportions))
+  chooseKeyFromProportions (config = {}) { // optional config
+    
+    let availableKeys = this.possibleKeys
+    if (_.isArray(config.only)) {
+      availableKeys = config.only
+    }
+    else if (_.isArray(config.exclude) && !_.isEmpty(config.exclude)) {
+      availableKeys = _.without(availableKeys, ...config.exclude)
+    }
+
+    const sumTotal = _.sum(_.values(_.pick(this.proportions, availableKeys)))
+    if (sumTotal <= 0) {
+      throw new Error('The sum of the current proportion values are negative. Try not using `only` or `exclude`.')
+    }
 
     const rawRoll = this.random() * sumTotal
     let currentSum = 0
 
-    for (let i = 0; i < this.possibleKeys.length; i++) {
-      const chosenKey = this.possibleKeys[i]
+    for (let i = 0; i < availableKeys.length; i++) {
+      const chosenKey = availableKeys[i]
       const proportionValue = this.proportions[chosenKey]
       currentSum += proportionValue
       if (currentSum > rawRoll) {
@@ -139,23 +155,6 @@ class Brng {
     return keyChosen
   }
 
-  selectKeyAtRandom (config) {
-    let excludeList = []
-    let keyChosen
-
-    if (_.isObject(config) && _.isArray(config.exclude)) {
-      excludeList = config.exclude
-    }
-
-    // !keyChosen -- it's the first iteration
-    // _.includes(excludeList, keyChosen) -- key already chosen, but should be excluded
-    while (!keyChosen || _.includes(excludeList, keyChosen)) {
-      keyChosen = this.chooseKeyFromProportions()
-    }
-    return keyChosen
-
-  }
-
   roll (/* value or config */) { // optional
     const keyFromArgs = arguments[0]
     const keyIsAvailable = _.has(this.originalProportions, keyFromArgs)
@@ -168,9 +167,9 @@ class Brng {
       // this.roll(value) is called incorectly
       throw new Error('The value ' + keyFromArgs + ' is not in your originalProportions.')
     }
-    else { // the normal this.roll()
-
-      keyChosen = this.selectKeyAtRandom(arguments[0])
+    else { // the normal this.roll() with a possible config
+      const config = arguments[0]
+      keyChosen = this.chooseKeyFromProportions(config)
 
       if (!this.passCriteria(keyChosen)) {
         return this.roll()
