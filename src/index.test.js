@@ -348,6 +348,54 @@ describe('Brng', function() {
       expect(fruitPicker.roll({exclude:['apple']})).to.not.equal('apple')
 
     })
+
+    it('should throw error when the remaining proportions sum up to a negative value', function () {
+      const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3})
+      fruitPicker.roll('apple')
+      fruitPicker.roll('orange')
+      fruitPicker.roll('orange')
+      expect(() => fruitPicker.roll({exclude: ['mango']})).to.throw()
+    })
+
+  })
+
+  describe('only', function () {
+    
+    it('should be accepted by the roll function', function () {
+      const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
+      
+      function testFunction () {
+        fruitPicker.roll({only: ['apple', 'orange', 'mango']})
+      }
+      expect(testFunction).to.not.throw()
+    })
+
+    it('should ONLY pick the given values', function () {
+      const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
+      
+      fruitPicker.roll()
+
+      expect(fruitPicker.roll({only:['apple', 'orange']})).to.be.oneOf(['apple', 'orange'])
+      expect(fruitPicker.roll({only:['apple', 'orange']})).to.be.oneOf(['apple', 'orange'])
+
+      expect(fruitPicker.roll({only:['mango', 'coconut']})).to.be.oneOf(['mango', 'coconut'])
+      expect(fruitPicker.roll({only:['mango', 'coconut']})).to.be.oneOf(['mango', 'coconut'])
+
+      expect(fruitPicker.roll({only:['apple', 'mango']})).to.be.oneOf(['apple', 'mango'])
+      expect(fruitPicker.roll({only:['apple', 'mango']})).to.be.oneOf(['apple', 'mango'])
+
+      expect(fruitPicker.roll({only:['orange', 'coconut']})).to.be.oneOf(['orange', 'coconut'])
+      expect(fruitPicker.roll({only:['orange', 'coconut']})).to.be.oneOf(['orange', 'coconut'])
+    })
+
+    it('should throw error when the possible proportions sum up to a negative value', function () {
+      const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3})
+      fruitPicker.roll('apple')
+      fruitPicker.roll('orange')
+      fruitPicker.roll('orange')
+      expect(() => fruitPicker.roll({only: ['apple', 'orange']})).to.throw()
+    })
+
   })
 
 })
