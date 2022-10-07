@@ -22,30 +22,34 @@ thoughts and mucking around, the algorithm was born.
 const roller = new Brng(originalProportions, config) // config is optional
 
 Constructor parameters:
-  originalProportions [REQUIRED] {Object[String/Number:Number]} -- key-value mapping of
-    weighted proportions. For example {mickeyd: 3, jackinthebox: 3, burgerking: 2, whataburger: 10}
-  config {Object}
-  config.random {Function} -- function that returns random number 0 - 1. Defaults to Math.random
-  config.keepHistory {Boolean} -- if true, keep the roll history
-  config.bias {Number} -- between 0 and 4. The higher the bias, the more it
-    favors values less chosen. If 0, it's basically a normal RNG. Defaults to 1.
-  config.repeatTolerance {Number} -- between 0 and 1. The lower the tolerance, the more
-    likely Brng will re-roll if it's a repeat. If 0, it'll never repeat. Defaults to 1.
+ originalProportions [REQUIRED] {Object[String/Number:Number]} -- key-value mapping of
+   weighted proportions. For example {mickeyd: 3, jackinthebox: 3, burgerking: 2, whataburger: 10}
+ config {Object}
+ config.random {Function} -- function that returns random number 0 - 1. Defaults to Math.random
+ config.keepHistory {Boolean} -- if true, keep the roll history
+ config.bias {Number} -- between 0 and 4. The higher the bias, the more it
+   favors values less chosen. If 0, it's basically a normal RNG. Defaults to 1.
+ config.repeatTolerance {Number} -- between 0 and 1. The lower the tolerance, the more
+   likely Brng will re-roll if it's a repeat. If 0, it'll never repeat. Defaults to 1.
 
 Public methods:
-  roll() -- selects a random value; remembers previous rolls.
-  flip(), pick(), select(), choose(), randomize() -- aliases of `roll()`
-  reset() -- resets all history and resets previous rolls
-  undo () -- undo the previous roll. must have `config.keepHistory === true`
+ roll() -- selects a random value; remembers previous rolls.
+ roll(value) -- force select the value from your original proportions. Ignores all criteria.
+ roll({exclude: [value1, value2]}) -- select a value that excludes any values in the array
+ roll({only: [value1, value2]}) -- select one of the values only within the given array
+
+ flip(), pick(), select(), choose(), randomize() -- aliases of `roll()`
+ reset() -- resets all history and resets previous rolls
+ undo () -- undo the previous roll. must have `config.keepHistory === true`
 
 Public readable values (if keepHistory === true):
-  historyArray -- array of every single previous roll
-  historyMapping -- hash of key to number of times rolled in total
+ historyArray -- array of every single previous roll
+ historyMapping -- hash of key to number of times rolled in total
 
 Public static values for common default proportions:
-  Brng.defaultProportions.one6SidedDie -- proportions for rolling 1 6-sided die
-  Brng.defaultProportions.two6SidedDice -- proportions for rolling 2 6-sided dice
-  Brng.defaultProportions.coin -- proportions for flipping 1 coin
+ Brng.defaultProportions.one6SidedDie -- proportions for rolling 1 6-sided die
+ Brng.defaultProportions.two6SidedDice -- proportions for rolling 2 6-sided dice
+ Brng.defaultProportions.coin -- proportions for flipping 1 coin
 ```
 
 
