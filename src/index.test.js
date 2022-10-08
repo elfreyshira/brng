@@ -61,7 +61,6 @@ describe('Brng', function() {
       historyMapping[chosenLetter] = historyMapping[chosenLetter] + 1
     }
 
-    // console.log(historyMapping)
     expect(historyMapping.a).to.be.closeTo(sampleSize*.1, sampleSize*0.01)
     expect(historyMapping.b).to.be.closeTo(sampleSize*.2, sampleSize*0.01)
     expect(historyMapping.c).to.be.closeTo(sampleSize*.3, sampleSize*0.01)
@@ -78,7 +77,6 @@ describe('Brng', function() {
       historyMapping[chosenLetter] = historyMapping[chosenLetter] + 1
     }
 
-    // console.log(historyMapping)
     expect(historyMapping.a).to.equal(sampleSize*.1)
     expect(historyMapping.b).to.equal(sampleSize*.2)
     expect(historyMapping.c).to.equal(sampleSize*.3)
@@ -349,14 +347,25 @@ describe('Brng', function() {
 
     })
 
-    it('should throw error when the remaining proportions sum up to a negative value', function () {
+    it('should pick something EVEN IF the remaining proportions sum up to a negative value', function () {
       const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3})
       
       fruitPicker.roll('apple')
       fruitPicker.roll('orange')
       fruitPicker.roll('orange')
 
-      expect(() => fruitPicker.roll({exclude: ['mango']})).to.throw('negative')
+      expect(() => fruitPicker.roll({exclude: ['mango']})).to.not.throw()
+      expect(fruitPicker.roll({exclude:['mango']})).to.be.oneOf(['apple', 'orange'])
+      expect(fruitPicker.roll({exclude:['mango']})).to.be.oneOf(['apple', 'orange'])
+    })
+
+    it('should throw error when the `exclude` array leaves no other options', function () {
+      const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3})
+
+      fruitPicker.roll()
+      fruitPicker.roll()
+
+      expect(() => fruitPicker.roll({exclude:['apple', 'orange', 'mango']})).to.throw('available options')
     })
 
   })
@@ -388,14 +397,25 @@ describe('Brng', function() {
       expect(fruitPicker.roll({only:['orange', 'coconut']})).to.be.oneOf(['orange', 'coconut'])
     })
 
-    it('should throw error when the possible proportions sum up to a negative value', function () {
+    it('should pick something EVEN IF the possible proportions sum up to a negative value', function () {
       const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3})
 
       fruitPicker.roll('apple')
       fruitPicker.roll('orange')
       fruitPicker.roll('orange')
 
-      expect(() => fruitPicker.roll({only: ['apple', 'orange']})).to.throw('negative')
+      expect(() => fruitPicker.roll({only: ['apple', 'orange']})).to.not.throw()
+      expect(fruitPicker.roll({only:['apple', 'orange']})).to.be.oneOf(['apple', 'orange'])
+      expect(fruitPicker.roll({only:['apple', 'orange']})).to.be.oneOf(['apple', 'orange'])
+    })
+
+    it('should throw error when the `only` array is empty', function () {
+      const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3})
+
+      fruitPicker.roll()
+      fruitPicker.roll()
+
+      expect(() => fruitPicker.roll({only: []})).to.throw('available options')
     })
 
   })

@@ -14,12 +14,15 @@ import isObject from 'lodash/isObject'
 import isArray from 'lodash/isArray'
 import includes from 'lodash/includes'
 import pick from 'lodash/pick'
-import isEmpty from 'lodash/isEmpty'
 import without from 'lodash/without'
+import isEmpty from 'lodash/isEmpty'
+import max from 'lodash/max'
+import findKey from 'lodash/findKey'
 
 const _ = {mapValues, forEach, constant, cloneDeep,
   sum, values, keys, reduce, isNumber, clamp, has,
-  isUndefined, isObject, isArray, includes, pick, isEmpty, without}
+  isUndefined, isObject, isArray, includes, pick,
+  without, isEmpty, max, findKey}
 
 /**
  * const roller = new Brng(config)
@@ -93,15 +96,26 @@ class Brng {
     if (_.isArray(config.only)) {
       availableKeys = config.only
     }
-    else if (_.isArray(config.exclude) && !_.isEmpty(config.exclude)) {
+    if (_.isArray(config.exclude)) {
       availableKeys = _.without(availableKeys, ...config.exclude)
     }
 
-    const sumTotal = _.sum(_.values(_.pick(this.proportions, availableKeys)))
-    if (sumTotal <= 0) {
-      throw new Error('The sum of the current proportion values are negative. Try not using `only` or `exclude`.')
+    if (_.isEmpty(availableKeys)) {
+      throw new Error('The values given in `only` or `exclude` gave no available options.')
     }
 
+    const availableProportions = _.pick(this.proportions, availableKeys)
+    const valuesOfAvailableOptions = _.values(availableProportions)
+    const sumTotal = _.sum(valuesOfAvailableOptions)
+    
+    // RETURNS the key with the highest proportion if the sum total is negative
+    if (sumTotal <= 0) {
+      const highestProportion = _.max(valuesOfAvailableOptions)
+      const chosenKey = _.findKey(availableProportions, (val) => val === highestProportion)
+      return chosenKey
+    }
+
+    // ELSE if everything is normal, proceed as normal
     const rawRoll = this.random() * sumTotal
     let currentSum = 0
 
@@ -114,7 +128,7 @@ class Brng {
       }
     }
 
-    console.warn('Code should not reach here.')
+    throw new Error('Something is wrong. Code should not reach here.')
   }
 
   // The second step of the algorithm: given the selected value, shift the proportion map around that value
