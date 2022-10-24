@@ -2,7 +2,7 @@ var expect = require('chai').expect
 var seed = require('seed-random')
 var _ = require('lodash')
 
-var Brng = require('../')
+var Brng = require('../index.js').default
 
 describe('Brng', function() {
   it('should flip a coin pretty well', function () {
@@ -416,6 +416,53 @@ describe('Brng', function() {
       fruitPicker.roll()
 
       expect(() => fruitPicker.roll({only: []})).to.throw('available options')
+    })
+
+  })
+
+  describe('pause and unpause', function () {
+    describe('pause(key)', function () {
+      it('should not throw Error, even if given a non-existent key', function () {
+        const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
+        fruitPicker.roll()
+
+        expect(() => {fruitPicker.pause('coconut')}).to.not.throw()
+        expect(() => {fruitPicker.pause('fake_key')}).to.not.throw()
+      })
+      it('should correctly pause the key', function () {
+        const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
+        fruitPicker.roll()
+
+        fruitPicker.pause('coconut')
+
+        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
+        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
+        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
+        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
+        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
+        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
+      })
+    })
+    describe('unpause(key)', function () {
+      it('should not throw Error, even if given a non-existent key', function () {
+        const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
+        fruitPicker.roll()
+
+        expect(() => {fruitPicker.unpause('coconut')}).to.not.throw()
+        expect(() => {fruitPicker.unpause('fake_key')}).to.not.throw()
+      })
+      it('should correctly unpause the key')
+    })
+  })
+
+  describe('add/update and remove', function () {
+    describe('`add/update', function () {
+      it('should add/update the key with the given proportion')
+    })
+    
+    describe('remove', function () {
+      it('should do nothing if given a non-existent key')
+      it('should correctly remove the key')
     })
 
   })

@@ -66,6 +66,7 @@ class Brng {
   }
 
   constructor (originalProportions, config = {}) {
+    
     this.keepHistory = !!config.keepHistory
     if (this.keepHistory) {
       this.historyMapping = _.mapValues(originalProportions, _.constant(0))
@@ -75,18 +76,28 @@ class Brng {
     this.previousRoll = null
     this.repeatTolerance = _.isNumber(config.repeatTolerance) ? _.clamp(config.repeatTolerance, 0, 1) : 1
     this.random = config.random || Math.random
+    
     this.originalProportions = _.cloneDeep(originalProportions)
     this.proportions = _.cloneDeep(originalProportions)
 
     const sumTotal = _.sum(_.values(originalProportions))
     this.originalProbabilities = _.mapValues(originalProportions, (number) => number / sumTotal)
-    this.possibleKeys = _.keys(originalProportions)
+    
+    this.#setPossibleKeys(_.keys(originalProportions))
 
     const baseValueToRedistribute = _.reduce(originalProportions, (sum, proportionValue, keyId) => {
       return sum + (proportionValue * this.originalProbabilities[keyId])
     }, 0)
     const biasMultiplier = _.isNumber(config.bias) ? _.clamp(config.bias, 0, 4) : 1
     this.valueToRedistribute = baseValueToRedistribute * biasMultiplier
+  }
+
+  #setPossibleKeys (keysArray) {
+    this.possibleKeys = _.cloneDeep(keysArray)
+  }
+
+  #setValueToRedistribute () {
+
   }
 
   // The first step of the algorithm: given a weighted proportion map, randomly select a value
@@ -217,6 +228,15 @@ class Brng {
       this.historyMapping = _.mapValues(this.originalProportions, _.constant(0))
       this.historyArray = []
     }
+  }
+
+  // roll() won't call the paused key anymore, and the proportions won't be affected
+  pause(key) {
+
+  }
+
+  unpause(key) {
+    
   }
 }
 
