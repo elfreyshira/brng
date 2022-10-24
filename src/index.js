@@ -18,11 +18,12 @@ import without from 'lodash/without'
 import isEmpty from 'lodash/isEmpty'
 import max from 'lodash/max'
 import findKey from 'lodash/findKey'
+import omit from 'lodash/omit'
 
 const _ = {mapValues, forEach, constant, cloneDeep,
   sum, values, keys, reduce, isNumber, clamp, has,
   isUndefined, isObject, isArray, includes, pick,
-  without, isEmpty, max, findKey}
+  without, isEmpty, max, findKey, omit}
 
 /**
  * const roller = new Brng(config)
@@ -73,31 +74,30 @@ class Brng {
       this.historyArray = []
     }
 
+    this.biasMultiplier = _.isNumber(config.bias) ? _.clamp(config.bias, 0, 4) : 1
+
     this.previousRoll = null
     this.repeatTolerance = _.isNumber(config.repeatTolerance) ? _.clamp(config.repeatTolerance, 0, 1) : 1
     this.random = config.random || Math.random
-    
-    this.originalProportions = _.cloneDeep(originalProportions)
+
+    this.#setupFromOriginalProportions(originalProportions)
+
+    // set up for the rest of the time
     this.proportions = _.cloneDeep(originalProportions)
+  }
+
+  #setupFromOriginalProportions (originalProportions) {
+    this.originalProportions = _.cloneDeep(originalProportions)
+
+    this.possibleKeys = _.keys(originalProportions)
 
     const sumTotal = _.sum(_.values(originalProportions))
     this.originalProbabilities = _.mapValues(originalProportions, (number) => number / sumTotal)
-    
-    this.#setPossibleKeys(_.keys(originalProportions))
 
     const baseValueToRedistribute = _.reduce(originalProportions, (sum, proportionValue, keyId) => {
       return sum + (proportionValue * this.originalProbabilities[keyId])
     }, 0)
-    const biasMultiplier = _.isNumber(config.bias) ? _.clamp(config.bias, 0, 4) : 1
-    this.valueToRedistribute = baseValueToRedistribute * biasMultiplier
-  }
-
-  #setPossibleKeys (keysArray) {
-    this.possibleKeys = _.cloneDeep(keysArray)
-  }
-
-  #setValueToRedistribute () {
-
+    this.valueToRedistribute = baseValueToRedistribute * this.biasMultiplier
   }
 
   // The first step of the algorithm: given a weighted proportion map, randomly select a value
@@ -144,7 +144,7 @@ class Brng {
 
   // The second step of the algorithm: given the selected value, shift the proportion map around that value
   // WARNING: method writes to this.proportions
-  shiftProportions (keyChosen) {
+  #shiftProportions (keyChosen) {
     this.proportions[keyChosen] = this.proportions[keyChosen] - this.valueToRedistribute
     _.forEach(this.possibleKeys, (otherKey) => {
       this.proportions[otherKey] = this.proportions[otherKey] +
@@ -154,7 +154,7 @@ class Brng {
 
   // the reverse of shiftProportions() for undo
   // WARNING: method writes to this.proportions
-  reverseShiftProportions (keyChosen) {
+  #reverseShiftProportions (keyChosen) {
     this.proportions[keyChosen] = this.proportions[keyChosen] + this.valueToRedistribute
     _.forEach(this.possibleKeys, (otherKey) => {
       this.proportions[otherKey] = this.proportions[otherKey] -
@@ -171,10 +171,11 @@ class Brng {
     }
   }
 
-  rollSideEffects (keyChosen) {
+  #rollSideEffects (keyChosen) {
     this.previousRoll = keyChosen
     if (this.keepHistory) {
-      this.historyMapping[keyChosen] = this.historyMapping[keyChosen] + 1
+      this.historyMapping[keyChosen] = this.historyMapping[keyChosen]
+        ? this.historyMapping[keyChosen] + 1 : 1
       this.historyArray.push(keyChosen)
     }
     return keyChosen
@@ -200,8 +201,8 @@ class Brng {
         return this.roll()
       }
     }
-    this.shiftProportions(keyChosen)
-    this.rollSideEffects(keyChosen)
+    this.#shiftProportions(keyChosen)
+    this.#rollSideEffects(keyChosen)
     return keyChosen
   }
   flip = this.roll
@@ -217,7 +218,7 @@ class Brng {
     const previousChoice = this.historyArray.pop() // ! writes to historyArray
     this.historyMapping[previousChoice] = this.historyMapping[previousChoice] - 1
 
-    this.reverseShiftProportions(previousChoice)
+    this.#reverseShiftProportions(previousChoice)
 
     return previousChoice
   }
@@ -237,6 +238,25 @@ class Brng {
 
   unpause(key) {
     
+  }
+
+  // add the key to the possible proportinos
+  add (newProportions) {
+    const originalProportions = _.cloneDeep(this.originalProportions)
+    _.forEach(newProportions, (proportionWeight, key) => {
+      originalProportions[key] = proportionWeight
+      if (!_.has(this.proportions, key)) {
+        this.proportions[key] = proportionWeight
+      }
+    })
+
+    this.#setupFromOriginalProportions(originalProportions)
+  }
+  update = this.add
+
+  remove (keyToRemove) {
+    const newOriginalProportions = _.omit(this.originalProportions, keyToRemove)
+    this.#setupFromOriginalProportions(newOriginalProportions)
   }
 }
 

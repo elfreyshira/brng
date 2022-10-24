@@ -420,7 +420,7 @@ describe('Brng', function() {
 
   })
 
-  describe('pause and unpause', function () {
+  describe.skip('pause and unpause', function () {
     describe('pause(key)', function () {
       it('should not throw Error, even if given a non-existent key', function () {
         const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
@@ -435,12 +435,9 @@ describe('Brng', function() {
 
         fruitPicker.pause('coconut')
 
-        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
-        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
-        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
-        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
-        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
-        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
+        const fruitsArray = []
+        _.times(10, () => fruitsArray.push(fruitPicker.roll()) )
+        expect(fruitsArray).to.not.include('coconut')
       })
     })
     describe('unpause(key)', function () {
@@ -451,18 +448,60 @@ describe('Brng', function() {
         expect(() => {fruitPicker.unpause('coconut')}).to.not.throw()
         expect(() => {fruitPicker.unpause('fake_key')}).to.not.throw()
       })
-      it('should correctly unpause the key')
+      it('should correctly unpause the key', function () {
+        const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
+        fruitPicker.roll()
+
+        fruitPicker.pause('coconut')
+
+        const fruitsArray = []
+        _.times(5, () => fruitsArray.push(fruitPicker.roll()) )
+        expect(fruitsArray).to.not.include('coconut')
+
+        fruitPicker.unpause('coconut')
+        const fruitsArray2 = []
+        _.times(10, () => fruitsArray2.push(fruitPicker.roll()) )
+        expect(fruitsArray2).to.include('coconut')
+
+      })
     })
   })
 
   describe('add/update and remove', function () {
-    describe('`add/update', function () {
-      it('should add/update the key with the given proportion')
+    describe('add/update', function () {
+      it('should add/update the key with the given proportion', function () {
+        const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
+        fruitPicker.roll()
+
+        fruitPicker.add({lychee: 2.5, peach: 3.5})
+        fruitPicker.update({banana: 4.5})
+
+        const fruitsArray = []
+        _.times(40, () => fruitsArray.push(fruitPicker.roll()) )
+
+        expect(fruitsArray).to.include('lychee')
+        expect(fruitsArray).to.include('peach')
+        expect(fruitsArray).to.include('banana')
+      })
     })
     
     describe('remove', function () {
-      it('should do nothing if given a non-existent key')
-      it('should correctly remove the key')
+      it('should do nothing if given a non-existent key', function () {
+        const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
+        fruitPicker.roll()
+
+        expect(() => fruitPicker.remove('fake_key')).to.not.throw()
+      })
+      it('should correctly remove the key', function () {
+        const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
+        fruitPicker.roll()
+
+        fruitPicker.remove('coconut')
+        const fruitsArray = []
+        _.times(10, () => fruitsArray.push(fruitPicker.roll()) )
+        expect(fruitsArray).to.not.include('coconut')
+
+      })
     })
 
   })
