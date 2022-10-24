@@ -470,7 +470,10 @@ describe('Brng', function() {
   describe('add/update and remove', function () {
     describe('add/update', function () {
       it('should add/update the key with the given proportion', function () {
-        const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
+        const fruitPicker = new Brng(
+          {apple: 1, orange: 2, mango: 3, coconut: 4},
+          {keepHistory: true, bias: 2}
+        )
         fruitPicker.roll()
 
         fruitPicker.add({lychee: 2.5, peach: 3.5})
@@ -493,7 +496,10 @@ describe('Brng', function() {
         expect(() => fruitPicker.remove('fake_key')).to.not.throw()
       })
       it('should correctly remove the key', function () {
-        const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
+        const fruitPicker = new Brng(
+          {apple: 1, orange: 2, mango: 3, coconut: 4},
+          {keepHistory: true, bias: 2}
+        )
         fruitPicker.roll()
 
         fruitPicker.remove('coconut')
