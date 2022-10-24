@@ -429,20 +429,22 @@ describe('Brng', function() {
         expect(() => {fruitPicker.pause('coconut')}).to.not.throw()
         expect(() => {fruitPicker.pause('fake_key')}).to.not.throw()
       })
-      it('should correctly pause the key', function () {
-        const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
-        fruitPicker.roll()
 
-        fruitPicker.pause('coconut')
+    //   it('should correctly pause the key', function () {
+    //     const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
+    //     fruitPicker.roll()
 
-        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
-        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
-        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
-        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
-        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
-        expect(fruitPicker.roll()).to.not.deep.equal('coconut')
-      })
-    })
+    //     fruitPicker.pause('coconut')
+
+    //     expect(fruitPicker.roll()).to.not.deep.equal('coconut')
+    //     expect(fruitPicker.roll()).to.not.deep.equal('coconut')
+    //     expect(fruitPicker.roll()).to.not.deep.equal('coconut')
+    //     expect(fruitPicker.roll()).to.not.deep.equal('coconut')
+    //     expect(fruitPicker.roll()).to.not.deep.equal('coconut')
+    //     expect(fruitPicker.roll()).to.not.deep.equal('coconut')
+    //   })
+    // })
+
     describe('unpause(key)', function () {
       it('should not throw Error, even if given a non-existent key', function () {
         const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
@@ -451,13 +453,25 @@ describe('Brng', function() {
         expect(() => {fruitPicker.unpause('coconut')}).to.not.throw()
         expect(() => {fruitPicker.unpause('fake_key')}).to.not.throw()
       })
-      it('should correctly unpause the key')
+      // it('should correctly unpause the key')
     })
   })
 
   describe('add/update and remove', function () {
     describe('`add/update', function () {
-      it('should add/update the key with the given proportion')
+      it('should add/update the key with the given original proportion', function () {
+        const fruitPicker = new Brng({apple: 1, orange: 2, mango: 3, coconut: 4})
+        fruitPicker.roll()
+
+        fruitPicker.add({lychee: 2.5, peach: 3.5})
+        fruitPicker.udpate({banana: 4.5})
+
+        const fruitsArray = []
+        _.times(40, () => fruitsArray.push(fruitPicker.roll()) )
+        expect(fruitsArray).to.incldue('lychee')
+        expect(fruitsArray).to.incldue('peach')
+        expect(fruitsArray).to.incldue('banana')
+      })
     })
     
     describe('remove', function () {
