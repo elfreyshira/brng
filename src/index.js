@@ -240,6 +240,16 @@ class Brng {
     
   }
 
+  updateProportions (newProportions) {
+    _.forEach(newProportions, (proportionWeight, key) => {
+      if (!_.has(this.proportions, key)) {
+        this.proportions[key] = proportionWeight
+      }
+    })
+
+    this.#setupFromOriginalProportions(_.cloneDeep(newProportions))
+  }
+
   // add the key to the possible proportinos
   add (newProportions) {
     const originalProportions = _.cloneDeep(this.originalProportions)
@@ -252,7 +262,6 @@ class Brng {
 
     this.#setupFromOriginalProportions(originalProportions)
   }
-  update = this.add
 
   remove (keyToRemove) {
     const newOriginalProportions = _.omit(this.originalProportions, keyToRemove)

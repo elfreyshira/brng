@@ -467,9 +467,52 @@ describe('Brng', function() {
     })
   })
 
-  describe('add/update and remove', function () {
-    describe('add/update', function () {
-      it('should add/update the key with the given proportion', function () {
+  describe('updateProportions', function () {
+    it('should fully replace the originalProportions', function () {
+      const fruitPicker = new Brng(
+        {apple: 1, orange: 2, mango: 3, coconut: 4},
+        {keepHistory: true, bias: 2}
+      )
+      fruitPicker.roll()
+      fruitPicker.roll()
+
+      fruitPicker.updateProportions({lychee: 2.5, peach: 3.5, banana: 4.5})
+
+      const fruitsArray = []
+      _.times(40, () => fruitsArray.push(fruitPicker.roll()) )
+
+      expect(fruitsArray).to.include('lychee')
+      expect(fruitsArray).to.include('peach')
+      expect(fruitsArray).to.include('banana')
+
+      expect(fruitsArray).to.not.include('apple')
+      expect(fruitsArray).to.not.include('orange')
+      expect(fruitsArray).to.not.include('mango')
+      expect(fruitsArray).to.not.include('coconut')
+    })
+    it('should also replace old proportion value', function () {
+      const fruitPicker = new Brng(
+        {apple: 1, orange: 2, mango: 3, coconut: 4},
+        {keepHistory: true, bias: 2}
+      )
+      fruitPicker.roll()
+      fruitPicker.roll()
+
+      fruitPicker.updateProportions({lychee: 2.5, apple: 5})
+
+      _.times(40, () => fruitPicker.roll())
+
+      const appleCount = fruitPicker.historyMapping.apple
+      const lycheeCount = fruitPicker.historyMapping.lychee
+      
+      expect(appleCount).to.be.greaterThan(lycheeCount)
+
+    })
+  })
+
+  describe('add and remove', function () {
+    describe('add', function () {
+      it('should add the key with the given proportion', function () {
         const fruitPicker = new Brng(
           {apple: 1, orange: 2, mango: 3, coconut: 4},
           {keepHistory: true, bias: 2}
@@ -477,7 +520,7 @@ describe('Brng', function() {
         fruitPicker.roll()
 
         fruitPicker.add({lychee: 2.5, peach: 3.5})
-        fruitPicker.update({banana: 4.5})
+        fruitPicker.add({banana: 4.5})
 
         const fruitsArray = []
         _.times(40, () => fruitsArray.push(fruitPicker.roll()) )
