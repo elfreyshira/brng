@@ -86,6 +86,13 @@ class Brng {
     this.proportions = _.cloneDeep(originalProportions)
   }
 
+  #setValueToRedistribute (biasMultiplier) {
+    const baseValueToRedistribute = _.reduce(this.originalProportions, (sum, proportionValue, keyId) => {
+      return sum + (proportionValue * this.originalProbabilities[keyId])
+    }, 0)
+    this.valueToRedistribute = baseValueToRedistribute * biasMultiplier
+  }
+
   #setupFromOriginalProportions (originalProportions) {
     this.originalProportions = _.cloneDeep(originalProportions)
 
@@ -94,10 +101,7 @@ class Brng {
     const sumTotal = _.sum(_.values(originalProportions))
     this.originalProbabilities = _.mapValues(originalProportions, (number) => number / sumTotal)
 
-    const baseValueToRedistribute = _.reduce(originalProportions, (sum, proportionValue, keyId) => {
-      return sum + (proportionValue * this.originalProbabilities[keyId])
-    }, 0)
-    this.valueToRedistribute = baseValueToRedistribute * this.biasMultiplier
+    this.#setValueToRedistribute(this.biasMultiplier)
   }
 
   // The first step of the algorithm: given a weighted proportion map, randomly select a value
@@ -269,7 +273,7 @@ class Brng {
   }
 
   setBias (bias) {
-
+    this.#setValueToRedistribute(bias)
   }
 }
 

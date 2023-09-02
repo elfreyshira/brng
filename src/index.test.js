@@ -555,7 +555,7 @@ describe('Brng', function() {
 
   })
 
-  describe.only('weight', function () {
+  describe('weight', function () {
     it('should change the proportion more with heavier weight', function () {
       var roller = new Brng({apple: 3, mango: 3, coconut: 3}, {random: seed('heavyWeight'), bias: 1})
 
@@ -574,8 +574,6 @@ describe('Brng', function() {
       expect(roller.proportions).to.deep.equal({apple: 2, mango: 3.5, coconut: 3.5})
     })
 
-
   })
   
-
 })
