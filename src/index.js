@@ -267,6 +267,10 @@ class Brng {
     const newOriginalProportions = _.omit(this.originalProportions, keyToRemove)
     this.#setupFromOriginalProportions(newOriginalProportions)
   }
+
+  setBias (bias) {
+
+  }
 }
 
 export default Brng
