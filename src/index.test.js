@@ -555,4 +555,42 @@ describe('Brng', function() {
 
   })
 
+  describe.only('weight', function () {
+    it('should change the proportion more with heavier weight', function () {
+      var roller = new Brng({heads: 1, tails: 1}, {random: seed('heavyWeight'), bias: 2})
+
+      roller.roll('tails')
+      roller.roll({weight: 2}) // should be heads
+      console.log(roller.proportions)
+
+      expect(true).to.be.true
+
+      expect(roller.proportions).to.deep.equal({ heads: 0, tails: 2 })
+    })
+
+    it('should change the proportion less with lower weight', function () {
+      var roller = new Brng({heads: 1, tails: 1}, {random: seed('heavyWeight'), bias: 2})
+
+      roller.roll('tails')
+      roller.roll('heads')
+      // roller.roll({weight: 0.5}) // should be heads
+      console.log(roller.proportions)
+
+
+      expect(roller.proportions.tails).to.be.greaterThan(roller.proportions.heads)
+    })
+
+    it('should have no proportion change with weight of 0', function () {
+      var roller = new Brng({apple: 1, mango: 2, coconut: 3}, {random: seed('heavyWeight'), bias: 2})
+
+      _.times(13, () => roller.roll({weight: 0}))
+      expect(roller.proportions).to.deep.equal(roller.originalProportions)
+
+      _.times(13, () => roller.roll({weight: 0}))
+      expect(roller.proportions).to.deep.equal(roller.originalProportions)
+    })
+
+  })
+  
+
 })
