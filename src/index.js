@@ -19,11 +19,12 @@ import isEmpty from 'lodash/isEmpty'
 import max from 'lodash/max'
 import findKey from 'lodash/findKey'
 import omit from 'lodash/omit'
+import intersection from 'lodash/intersection'
 
 const _ = {mapValues, forEach, constant, cloneDeep,
   sum, values, keys, reduce, isNumber, clamp, has,
   isUndefined, isObject, isArray, includes, pick,
-  without, isEmpty, max, findKey, omit}
+  without, isEmpty, max, findKey, omit, intersection}
 
 /**
  * const roller = new Brng(config)
@@ -109,7 +110,7 @@ class Brng {
     
     let availableKeys = this.possibleKeys
     if (_.isArray(config.only)) {
-      availableKeys = config.only
+      availableKeys = _.intersection(availableKeys, config.only)
     }
     if (_.isArray(config.exclude)) {
       availableKeys = _.without(availableKeys, ...config.exclude)

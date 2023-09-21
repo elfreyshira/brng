@@ -508,6 +508,25 @@ describe('Brng', function() {
       expect(appleCount).to.be.greaterThan(lycheeCount)
 
     })
+    it('should work together with {only: [...]}', function () {
+      const fruitPicker = new Brng(
+        {apple: 1, orange: 2, mango: 3, coconut: 4},
+        {keepHistory: true, bias: 2}
+      )
+      fruitPicker.roll({exclude: 'coconut'})
+      fruitPicker.roll({exclude: 'coconut'})
+
+      fruitPicker.updateProportions({lychee: 2.5, apple: 5})
+
+      _.times(100, () => fruitPicker.roll({only: ['lychee', 'apple', 'coconut']}))
+
+      const appleCount = fruitPicker.historyMapping.apple
+      const lycheeCount = fruitPicker.historyMapping.lychee
+      const coconutCount = fruitPicker.historyMapping.coconut
+      
+      expect(appleCount).to.be.greaterThan(lycheeCount)
+      expect(coconutCount).to.equal(0)
+    })
   })
 
   describe('add and remove', function () {
