@@ -513,8 +513,9 @@ describe('Brng', function() {
         {apple: 1, orange: 2, mango: 3, coconut: 4},
         {keepHistory: true, bias: 2}
       )
-      fruitPicker.roll({exclude: 'coconut'})
-      fruitPicker.roll({exclude: 'coconut'})
+      fruitPicker.roll({exclude: ['coconut']})
+      fruitPicker.roll({exclude: ['coconut']})
+      fruitPicker.roll({exclude: ['coconut']})
 
       fruitPicker.updateProportions({lychee: 2.5, apple: 5})
 
@@ -594,5 +595,38 @@ describe('Brng', function() {
     })
 
   })
-  
+
+  describe('Brng.random', () => {
+    it('should work to replace Math.random', () => {
+
+      Brng.random = seed('brngrandom')
+      const fruitPicker = new Brng(
+        {apple: 1, orange: 2, mango: 3, coconut: 4},
+        {keepHistory: true}
+      )
+
+      _.times(6, () => fruitPicker.roll())
+      expect(fruitPicker.historyArray).to.deep.equal(
+        [ 'coconut', 'orange', 'coconut', 'orange', 'coconut', 'mango' ])
+
+      Brng.resetRandom()
+    })
+
+    describe('config.random', () => {
+      it('should override any Brng.random set', () => {
+        Brng.random = seed('brngrandom')
+        const fruitPicker = new Brng(
+          {apple: 1, orange: 2, mango: 3, coconut: 4},
+          {keepHistory: true, random: seed('randomoverride')}
+        )
+
+        _.times(6, () => fruitPicker.roll())
+        expect(fruitPicker.historyArray).to.deep.equal(
+          [ 'orange', 'coconut', 'coconut', 'mango', 'mango', 'orange' ])
+
+        Brng.resetRandom()
+      })
+    })
+  })
+
 })

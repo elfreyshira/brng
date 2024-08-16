@@ -33,7 +33,8 @@ const _ = {mapValues, forEach, constant, cloneDeep,
  *  originalProportions [REQUIRED] {Object[String/Number:Number]} -- key-value mapping of
  *    weighted proportions. For example {mickeyd: 3, jackinthebox: 3, burgerking: 2, whataburger: 10}
  *  config {Object}
- *  config.random {Function} -- function that returns random number 0 - 1. Defaults to Math.random
+ *  config.random {Function} -- function that returns random number 0 - 1.
+ *    Defaults to Math.random // overrides Brng.random
  *  config.keepHistory {Boolean} -- if true, keep the roll history
  *  config.bias {Number} -- between 0 and 4. The higher the bias, the more it
  *    favors values less chosen. If 0, it's basically a normal RNG. Defaults to 1.
@@ -58,6 +59,7 @@ const _ = {mapValues, forEach, constant, cloneDeep,
  *  Brng.defaultProportions.one6SidedDie -- proportions for rolling 1 6-sided die
  *  Brng.defaultProportions.two6SidedDice -- proportions for rolling 2 6-sided dice
  *  Brng.defaultProportions.coin -- proportions for flipping 1 coin
+ *  Brng.random -- universal. function that returns random number 0 - 1. default Math.random
  */
 class Brng {
 
@@ -65,6 +67,12 @@ class Brng {
     one6SidedDie: {1:1, 2:1, 3:1, 4:1, 5:1, 6:1},
     two6SidedDice: {2:1, 3:2, 4:3, 5:4, 6:5, 7:6, 8:5, 9:4, 10:3, 11:2, 12:1},
     coin: {heads: 1, tails: 1}
+  }
+
+  static random = Math.random
+
+  static resetRandom () {
+    Brng.random = Math.random
   }
 
   constructor (originalProportions, config = {}) {
@@ -79,7 +87,8 @@ class Brng {
 
     this.previousRoll = null
     this.repeatTolerance = _.isNumber(config.repeatTolerance) ? _.clamp(config.repeatTolerance, 0, 1) : 1
-    this.random = config.random || Math.random
+    
+    this.random = config.random || Brng.random
 
     this.#setupFromOriginalProportions(originalProportions)
 
